@@ -1,0 +1,53 @@
+import type { SiteContent } from '../types/site-content';
+
+export const defaultContent: SiteContent = {
+  home: {
+    badge: '',
+    title: '',
+    description: '',
+    heroImage: '',
+    heroImageAlt: '',
+    primaryCtaText: '',
+    secondaryCtaText: '',
+  },
+  about: {
+    sectionLabel: '',
+    title: '',
+    imagePrimary: '',
+    imagePrimaryAlt: '',
+    imageSecondary: '',
+    imageSecondaryAlt: '',
+    descriptionOne: '',
+    descriptionTwo: '',
+    experienceEnabled: false,
+    experienceValue: '',
+    experienceLabel: '',
+  },
+  services: {
+    sectionLabel: '',
+    title: '',
+    description: '',
+    items: [],
+  },
+  gallery: {
+    sectionLabel: '',
+    title: '',
+    description: '',
+    items: [],
+  },
+  contact: {
+    sectionLabel: '',
+    title: '',
+    description: '',
+    emailLabel: '',
+    emailPrimary: '',
+    emailSecondary: '',
+    phoneLabel: '',
+    phonePrimary: '',
+    phoneSecondary: '',
+    addressLabel: '',
+    address: '',
+    websiteLabel: '',
+    website: '',
+  },
+};
