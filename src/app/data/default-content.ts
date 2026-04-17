@@ -22,6 +22,25 @@ export const defaultContent: SiteContent = {
     experienceEnabled: false,
     experienceValue: '',
     experienceLabel: '',
+    trustIndicatorsEnabled: true,
+    trustIndicators: [
+      {
+        value: '15+',
+        label: 'Years Experience',
+      },
+      {
+        value: '500+',
+        label: 'Projects Completed',
+      },
+      {
+        value: '15+',
+        label: 'Export Countries',
+      },
+      {
+        value: '100%',
+        label: 'Client Satisfaction',
+      },
+    ],
   },
   services: {
     sectionLabel: '',

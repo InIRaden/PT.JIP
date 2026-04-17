@@ -23,6 +23,24 @@ export default function App({ content }: AppProps) {
   const galleryItems = gallerySection.items;
   const contact = content.contact;
 
+  const trustIndicators = useMemo(() => {
+    const fallback = [
+      { value: '15+', label: 'Years Experience' },
+      { value: '500+', label: 'Projects Completed' },
+      { value: '15+', label: 'Export Countries' },
+      { value: '100%', label: 'Client Satisfaction' },
+    ];
+    const source = Array.isArray(about.trustIndicators) ? about.trustIndicators : [];
+
+    return Array.from({ length: 4 }, (_, index) => {
+      const current = source[index];
+      return {
+        value: current?.value?.trim() || fallback[index].value,
+        label: current?.label?.trim() || fallback[index].label,
+      };
+    });
+  }, [about.trustIndicators]);
+
   const galleryCategories = useMemo(() => {
     const unique = Array.from(
       new Set(galleryItems.map((item) => item.category?.trim() || 'Lainnya')),
@@ -353,28 +371,20 @@ export default function App({ content }: AppProps) {
       </section>
 
       {/* Trust Indicators */}
-      <section className="py-20 bg-gradient-to-br from-[var(--navy)] to-[var(--ocean-blue)] text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div className="space-y-2">
-              <p className="text-5xl font-bold text-[var(--gold)]">15+</p>
-              <p className="text-white/80">Years Experience</p>
-            </div>
-            <div className="space-y-2">
-              <p className="text-5xl font-bold text-[var(--gold)]">500+</p>
-              <p className="text-white/80">Projects Completed</p>
-            </div>
-            <div className="space-y-2">
-              <p className="text-5xl font-bold text-[var(--gold)]">15+</p>
-              <p className="text-white/80">Export Countries</p>
-            </div>
-            <div className="space-y-2">
-              <p className="text-5xl font-bold text-[var(--gold)]">100%</p>
-              <p className="text-white/80">Client Satisfaction</p>
+      {about.trustIndicatorsEnabled ? (
+        <section className="py-20 bg-gradient-to-br from-[var(--navy)] to-[var(--ocean-blue)] text-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+              {trustIndicators.map((indicator, index) => (
+                <div key={`trust-indicator-${index}`} className="space-y-2">
+                  <p className="text-5xl font-bold text-[var(--gold)]">{indicator.value || '-'}</p>
+                  <p className="text-white/80">{indicator.label || '-'}</p>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
       {/* Contact Section */}
       <section id="contact" className="py-20 md:py-32 bg-[var(--cream)]">

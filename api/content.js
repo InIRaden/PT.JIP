@@ -22,6 +22,25 @@ const defaultContent = {
     experienceEnabled: false,
     experienceValue: '',
     experienceLabel: '',
+    trustIndicatorsEnabled: true,
+    trustIndicators: [
+      {
+        value: '15+',
+        label: 'Years Experience',
+      },
+      {
+        value: '500+',
+        label: 'Projects Completed',
+      },
+      {
+        value: '15+',
+        label: 'Export Countries',
+      },
+      {
+        value: '100%',
+        label: 'Client Satisfaction',
+      },
+    ],
   },
   services: {
     sectionLabel: '',
@@ -187,6 +206,9 @@ function normalizeSiteContent(raw) {
   const galleryRaw = obj.gallery;
   const galleryObj = asRecord(galleryRaw);
   const contact = asRecord(obj.contact);
+  const aboutTrustIndicators = Array.isArray(about.trustIndicators)
+    ? about.trustIndicators
+    : defaultContent.about.trustIndicators;
 
   const legacyServicesArray = Array.isArray(servicesRaw) ? servicesRaw : undefined;
   const legacyGalleryArray = Array.isArray(galleryRaw) ? galleryRaw : undefined;
@@ -251,6 +273,25 @@ function normalizeSiteContent(raw) {
         typeof about.experienceLabel === 'string'
           ? about.experienceLabel
           : defaultContent.about.experienceLabel,
+      trustIndicatorsEnabled:
+        typeof about.trustIndicatorsEnabled === 'boolean'
+          ? about.trustIndicatorsEnabled
+          : defaultContent.about.trustIndicatorsEnabled,
+      trustIndicators: Array.from({ length: 4 }, (_, index) => {
+        const fallback = defaultContent.about.trustIndicators[index] ?? { value: '', label: '' };
+        const indicator = asRecord(aboutTrustIndicators[index]);
+
+        return {
+          value:
+            typeof indicator.value === 'string'
+              ? indicator.value
+              : fallback.value,
+          label:
+            typeof indicator.label === 'string'
+              ? indicator.label
+              : fallback.label,
+        };
+      }),
     },
     services: {
       sectionLabel:
@@ -457,6 +498,11 @@ async function ensureTableSchema() {
       image_secondary_alt TEXT NOT NULL DEFAULT '',
       description_one TEXT NOT NULL DEFAULT '',
       description_two TEXT NOT NULL DEFAULT '',
+      experience_enabled BOOLEAN NOT NULL DEFAULT FALSE,
+      experience_value TEXT NOT NULL DEFAULT '',
+      experience_label TEXT NOT NULL DEFAULT '',
+      trust_indicators_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+      trust_indicators JSONB NOT NULL DEFAULT '[]'::jsonb,
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
   `;
@@ -465,7 +511,9 @@ async function ensureTableSchema() {
     ALTER TABLE about_content
       ADD COLUMN IF NOT EXISTS experience_enabled BOOLEAN NOT NULL DEFAULT FALSE,
       ADD COLUMN IF NOT EXISTS experience_value TEXT NOT NULL DEFAULT '',
-      ADD COLUMN IF NOT EXISTS experience_label TEXT NOT NULL DEFAULT '';
+      ADD COLUMN IF NOT EXISTS experience_label TEXT NOT NULL DEFAULT '',
+      ADD COLUMN IF NOT EXISTS trust_indicators_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+      ADD COLUMN IF NOT EXISTS trust_indicators JSONB NOT NULL DEFAULT '[]'::jsonb;
   `;
 
   await sql`
@@ -595,6 +643,8 @@ async function writeNormalizedTables(content) {
       experience_enabled,
       experience_value,
       experience_label,
+      trust_indicators,
+      trust_indicators_enabled,
       updated_at
     )
     VALUES (
@@ -610,6 +660,8 @@ async function writeNormalizedTables(content) {
       ${content.about.experienceEnabled},
       ${content.about.experienceValue},
       ${content.about.experienceLabel},
+      ${JSON.stringify(content.about.trustIndicators)}::jsonb,
+      ${content.about.trustIndicatorsEnabled},
       NOW()
     )
     ON CONFLICT (singleton_id)
@@ -622,9 +674,11 @@ async function writeNormalizedTables(content) {
       image_secondary_alt = EXCLUDED.image_secondary_alt,
       description_one = EXCLUDED.description_one,
       description_two = EXCLUDED.description_two,
-        experience_enabled = EXCLUDED.experience_enabled,
-        experience_value = EXCLUDED.experience_value,
-        experience_label = EXCLUDED.experience_label,
+      experience_enabled = EXCLUDED.experience_enabled,
+      experience_value = EXCLUDED.experience_value,
+      experience_label = EXCLUDED.experience_label,
+      trust_indicators = EXCLUDED.trust_indicators,
+      trust_indicators_enabled = EXCLUDED.trust_indicators_enabled,
       updated_at = NOW();
   `;
 
@@ -824,6 +878,10 @@ async function readFromNormalizedTables() {
           experienceEnabled: Boolean(about.experience_enabled),
           experienceValue: about.experience_value ?? '',
           experienceLabel: about.experience_label ?? '',
+          trustIndicatorsEnabled: Boolean(about.trust_indicators_enabled),
+          trustIndicators: Array.isArray(about.trust_indicators)
+            ? about.trust_indicators
+            : defaultContent.about.trustIndicators,
         }
       : {},
     services: services

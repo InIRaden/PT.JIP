@@ -22,6 +22,11 @@ export type AboutContent = {
   experienceEnabled: boolean;
   experienceValue: string;
   experienceLabel: string;
+  trustIndicatorsEnabled: boolean;
+  trustIndicators: Array<{
+    value: string;
+    label: string;
+  }>;
 };
 
 export type ServiceItem = {

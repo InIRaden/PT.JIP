@@ -68,7 +68,6 @@ export function AdminLoginPage({ onLoginSuccess }: AdminLoginPageProps) {
           </button>
         </form>
 
-        <p className="text-xs text-[var(--dark-text)]/50 mt-5">Default login: JIP / JayengIntiPratama</p>
       </div>
     </div>
   );

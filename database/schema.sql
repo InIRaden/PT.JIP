@@ -44,6 +44,8 @@ CREATE TABLE IF NOT EXISTS about_content (
   experience_enabled BOOLEAN NOT NULL DEFAULT FALSE,
   experience_value TEXT NOT NULL DEFAULT '',
   experience_label TEXT NOT NULL DEFAULT '',
+  trust_indicators_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+  trust_indicators JSONB NOT NULL DEFAULT '[]'::jsonb,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   CONSTRAINT about_singleton CHECK (singleton_id)
 );

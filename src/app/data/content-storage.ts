@@ -141,6 +141,9 @@ function normalizeSiteContent(raw: unknown): SiteContent {
   const galleryObj = asRecord(galleryRaw);
   const contact = asRecord(obj.contact);
   const home = asRecord(obj.home);
+  const aboutTrustIndicators = Array.isArray(about.trustIndicators)
+    ? about.trustIndicators
+    : defaultContent.about.trustIndicators;
 
   const legacyServicesArray = Array.isArray(servicesRaw) ? servicesRaw : undefined;
   const legacyGalleryArray = Array.isArray(galleryRaw) ? galleryRaw : undefined;
@@ -203,6 +206,25 @@ function normalizeSiteContent(raw: unknown): SiteContent {
         typeof about.experienceLabel === 'string'
           ? about.experienceLabel
           : defaultContent.about.experienceLabel,
+      trustIndicatorsEnabled:
+        typeof about.trustIndicatorsEnabled === 'boolean'
+          ? about.trustIndicatorsEnabled
+          : defaultContent.about.trustIndicatorsEnabled,
+      trustIndicators: Array.from({ length: 4 }, (_, index) => {
+        const fallback = defaultContent.about.trustIndicators[index] ?? { value: '', label: '' };
+        const indicator = asRecord(aboutTrustIndicators[index]);
+
+        return {
+          value:
+            typeof indicator.value === 'string'
+              ? indicator.value
+              : fallback.value,
+          label:
+            typeof indicator.label === 'string'
+              ? indicator.label
+              : fallback.label,
+        };
+      }),
     },
     services: {
       sectionLabel:

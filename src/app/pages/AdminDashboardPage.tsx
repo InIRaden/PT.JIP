@@ -26,6 +26,7 @@ const MAX_IMAGE_HEIGHT = 1600;
 const IMAGE_OUTPUT_QUALITY = 0.78;
 const MAX_DATA_URL_SIZE_KB = 700;
 const SERVICE_BULLET_LIMIT = 4;
+const TRUST_INDICATOR_LIMIT = 4;
 
 function buildServiceBulletSlots(items: string[]): string[] {
   return Array.from({ length: SERVICE_BULLET_LIMIT }, (_, index) => items[index] ?? '');
@@ -347,6 +348,32 @@ export function AdminDashboardPage({ content, onSave, onReset, onLogout }: Admin
     }));
   };
 
+  const updateTrustIndicator = (
+    indicatorIndex: number,
+    field: 'value' | 'label',
+    value: string,
+  ) => {
+    setDraft((prev) => {
+      const nextIndicators = Array.from({ length: TRUST_INDICATOR_LIMIT }, (_, index) => ({
+        value: prev.about.trustIndicators[index]?.value ?? '',
+        label: prev.about.trustIndicators[index]?.label ?? '',
+      }));
+
+      nextIndicators[indicatorIndex] = {
+        ...nextIndicators[indicatorIndex],
+        [field]: value,
+      };
+
+      return {
+        ...prev,
+        about: {
+          ...prev.about,
+          trustIndicators: nextIndicators,
+        },
+      };
+    });
+  };
+
   const handleSave = async () => {
     await saveDraftNow();
   };
@@ -556,6 +583,61 @@ export function AdminDashboardPage({ content, onSave, onReset, onLogout }: Admin
                         disabled={!draft.about.experienceEnabled}
                       />
                     </div>
+                  </div>
+                </div>
+
+                <div className="mt-5 rounded-xl border border-[var(--navy)]/15 bg-[var(--cream)]/50 p-4 space-y-3">
+                  <label className="flex items-center gap-3 text-sm font-semibold text-[var(--navy)]">
+                    <input
+                      type="checkbox"
+                      checked={draft.about.trustIndicatorsEnabled}
+                      onChange={(e) =>
+                        setDraft((prev) => ({
+                          ...prev,
+                          about: {
+                            ...prev.about,
+                            trustIndicatorsEnabled: e.target.checked,
+                          },
+                        }))
+                      }
+                      className="w-4 h-4"
+                    />
+                    Tampilkan Trust Indicators (Statistik Biru) di Landing Page
+                  </label>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {Array.from({ length: TRUST_INDICATOR_LIMIT }, (_, index) => {
+                      const indicator = draft.about.trustIndicators[index] ?? { value: '', label: '' };
+
+                      return (
+                        <div
+                          key={`trust-indicator-${index}`}
+                          className="rounded-lg border border-[var(--navy)]/10 bg-white p-3 space-y-3"
+                        >
+                          <p className="text-xs font-semibold text-[var(--dark-text)]/60">Statistik #{index + 1}</p>
+                          <div>
+                            <label className="block text-sm font-semibold text-[var(--navy)] mb-1">Nilai</label>
+                            <input
+                              value={indicator.value}
+                              onChange={(e) => updateTrustIndicator(index, 'value', e.target.value)}
+                              placeholder="Contoh: 15+"
+                              className="w-full px-3 py-2 border border-[var(--navy)]/20 rounded-lg"
+                              disabled={!draft.about.trustIndicatorsEnabled}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold text-[var(--navy)] mb-1">Label</label>
+                            <input
+                              value={indicator.label}
+                              onChange={(e) => updateTrustIndicator(index, 'label', e.target.value)}
+                              placeholder="Contoh: Years Experience"
+                              className="w-full px-3 py-2 border border-[var(--navy)]/20 rounded-lg"
+                              disabled={!draft.about.trustIndicatorsEnabled}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </section>
