@@ -77,6 +77,8 @@ const DB_WRITE_MAX_RETRIES = 3;
 const DB_READ_MAX_RETRIES = 2;
 const DB_RETRY_BASE_DELAY_MS = 250;
 const READ_CACHE_TTL_MS = 30000;
+const SERVICE_ICON_VALUES = ['zap', 'ship', 'fish', 'truck', 'package', 'briefcase', 'building', 'handshake', 'shield'];
+const DEFAULT_SERVICE_ICON = SERVICE_ICON_VALUES[0];
 
 if (!databaseUrl) {
   throw new Error('DATABASE_URL is required for API /api/content');
@@ -87,6 +89,14 @@ const sql = neon(databaseUrl);
 let lastKnownContent = normalizeSiteContent(defaultContent);
 let ensureSchemaPromise = null;
 let lastKnownContentUpdatedAt = 0;
+
+function isServiceIcon(value) {
+  return typeof value === 'string' && SERVICE_ICON_VALUES.includes(value);
+}
+
+function getServiceIconByIndex(index) {
+  return SERVICE_ICON_VALUES[index % SERVICE_ICON_VALUES.length] ?? DEFAULT_SERVICE_ICON;
+}
 
 function wait(ms) {
   return new Promise((resolve) => {
@@ -217,7 +227,7 @@ function normalizeSiteContent(raw) {
     title: '',
     description: '',
     items: [],
-    icon: 'zap',
+    icon: DEFAULT_SERVICE_ICON,
   };
   const fallbackGalleryItem = {
     id: 1,
@@ -309,7 +319,7 @@ function normalizeSiteContent(raw) {
           defaultContent.services.items[index] ?? {
             ...fallbackServiceItem,
             id: index + 1,
-            icon: index % 2 === 1 ? 'ship' : 'zap',
+            icon: getServiceIconByIndex(index),
           };
         const list = Array.isArray(rec.items) ? rec.items : fallback.items;
         return {
@@ -321,7 +331,7 @@ function normalizeSiteContent(raw) {
             .map((v) => v.trim())
             .filter((v) => v.length > 0)
             .slice(0, 4),
-          icon: rec.icon === 'ship' || rec.icon === 'zap' ? rec.icon : fallback.icon,
+          icon: isServiceIcon(rec.icon) ? rec.icon : fallback.icon,
         };
       }),
     },
@@ -896,7 +906,7 @@ async function readFromNormalizedTables() {
             items: Array.isArray(item.bullet_items)
               ? item.bullet_items.filter((v) => typeof v === 'string')
               : [],
-            icon: item.icon === 'ship' ? 'ship' : 'zap',
+            icon: isServiceIcon(item.icon) ? item.icon : getServiceIconByIndex(index),
           })),
         }
       : {},

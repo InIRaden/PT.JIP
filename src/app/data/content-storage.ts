@@ -1,11 +1,23 @@
 import { defaultContent } from './default-content';
-import type { ServiceItem, SiteContent } from '../types/site-content';
+import type { ServiceIcon, ServiceItem, SiteContent } from '../types/site-content';
 
 const AUTH_KEY = 'jip-admin-auth';
 const FETCH_TIMEOUT_MS = 25000;
 const FETCH_MAX_RETRIES = 3;
 const SAVE_TIMEOUT_MS = 15000;
 const SAVE_MAX_RETRIES = 2;
+const SERVICE_ICON_VALUES: ServiceIcon[] = [
+  'zap',
+  'ship',
+  'fish',
+  'truck',
+  'package',
+  'briefcase',
+  'building',
+  'handshake',
+  'shield',
+];
+const DEFAULT_SERVICE_ICON: ServiceIcon = SERVICE_ICON_VALUES[0] ?? 'zap';
 
 export type SaveResult = {
   ok: boolean;
@@ -13,6 +25,14 @@ export type SaveResult = {
   savedRemote: boolean;
   message: string;
 };
+
+function isServiceIcon(value: unknown): value is ServiceIcon {
+  return typeof value === 'string' && SERVICE_ICON_VALUES.includes(value as ServiceIcon);
+}
+
+function getServiceIconByIndex(index: number): ServiceIcon {
+  return SERVICE_ICON_VALUES[index % SERVICE_ICON_VALUES.length] ?? DEFAULT_SERVICE_ICON;
+}
 
 function isSameContent(a: SiteContent, b: SiteContent): boolean {
   return JSON.stringify(a) === JSON.stringify(b);
@@ -152,7 +172,7 @@ function normalizeSiteContent(raw: unknown): SiteContent {
     title: '',
     description: '',
     items: [],
-    icon: 'zap',
+    icon: DEFAULT_SERVICE_ICON,
   };
   const fallbackGalleryItem = {
     id: 1,
@@ -243,7 +263,7 @@ function normalizeSiteContent(raw: unknown): SiteContent {
           defaultContent.services.items[index] ?? {
             ...fallbackServiceItem,
             id: index + 1,
-            icon: index % 2 === 1 ? 'ship' : 'zap',
+            icon: getServiceIconByIndex(index),
           };
         const list = Array.isArray(rec.items) ? rec.items : fallback.items;
         return {
@@ -256,7 +276,7 @@ function normalizeSiteContent(raw: unknown): SiteContent {
             .map((v) => v.trim())
             .filter((v) => v.length > 0)
             .slice(0, 4),
-          icon: rec.icon === 'ship' || rec.icon === 'zap' ? rec.icon : fallback.icon,
+          icon: isServiceIcon(rec.icon) ? rec.icon : fallback.icon,
         };
       }),
     },

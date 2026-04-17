@@ -1,4 +1,13 @@
-export type ServiceIcon = 'zap' | 'ship';
+export type ServiceIcon =
+  | 'zap'
+  | 'ship'
+  | 'fish'
+  | 'truck'
+  | 'package'
+  | 'briefcase'
+  | 'building'
+  | 'handshake'
+  | 'shield';
 
 export type HomeContent = {
   badge: string;

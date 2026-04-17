@@ -1,7 +1,24 @@
 import { useMemo, useState } from 'react';
 import { ImageWithFallback } from './components/shared/ImageWithFallback';
 import { AppLogo } from './components/branding/AppLogo';
-import { Menu, X, Ship, Zap, CheckCircle, Mail, Phone, MapPin, Globe } from 'lucide-react';
+import {
+  Menu,
+  X,
+  Ship,
+  Fish,
+  Zap,
+  Truck,
+  Package,
+  Briefcase,
+  Building2,
+  Handshake,
+  ShieldCheck,
+  CheckCircle,
+  Mail,
+  Phone,
+  MapPin,
+  Globe,
+} from 'lucide-react';
 import type { ServiceIcon, SiteContent } from './types/site-content';
 
 type AppProps = {
@@ -78,10 +95,29 @@ export default function App({ content }: AppProps) {
   }, [services]);
 
   const renderServiceIcon = (icon: ServiceIcon, isFirst: boolean) => {
-    if (icon === 'zap') {
-      return <Zap className={`w-5 h-5 ${isFirst ? 'text-[var(--gold)]' : 'text-white'}`} />;
+    const className = `w-5 h-5 ${isFirst ? 'text-[var(--gold)]' : 'text-white'}`;
+
+    switch (icon) {
+      case 'ship':
+        return <Ship className={className} />;
+      case 'fish':
+        return <Fish className={className} />;
+      case 'truck':
+        return <Truck className={className} />;
+      case 'package':
+        return <Package className={className} />;
+      case 'briefcase':
+        return <Briefcase className={className} />;
+      case 'building':
+        return <Building2 className={className} />;
+      case 'handshake':
+        return <Handshake className={className} />;
+      case 'shield':
+        return <ShieldCheck className={className} />;
+      case 'zap':
+      default:
+        return <Zap className={className} />;
     }
-    return <Ship className={`w-5 h-5 ${isFirst ? 'text-[var(--gold)]' : 'text-white'}`} />;
   };
 
   return (

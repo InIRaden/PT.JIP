@@ -1,6 +1,6 @@
 import { type ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { AppLogo } from '../components/branding/AppLogo';
-import type { GalleryItem, ServiceItem, SiteContent } from '../types/site-content';
+import type { GalleryItem, ServiceIcon, ServiceItem, SiteContent } from '../types/site-content';
 import type { SaveResult } from '../data/content-storage';
 
 type AdminDashboardPageProps = {
@@ -27,6 +27,27 @@ const IMAGE_OUTPUT_QUALITY = 0.78;
 const MAX_DATA_URL_SIZE_KB = 700;
 const SERVICE_BULLET_LIMIT = 4;
 const TRUST_INDICATOR_LIMIT = 4;
+const SERVICE_ICON_OPTIONS: Array<{ value: ServiceIcon; label: string }> = [
+  { value: 'zap', label: 'Petir (Energi dan Kelistrikan)' },
+  { value: 'ship', label: 'Kapal (Ekspor Impor)' },
+  { value: 'fish', label: 'Ikan (Perikanan dan Kelautan)' },
+  { value: 'truck', label: 'Truk (Logistik Darat)' },
+  { value: 'package', label: 'Paket (Distribusi Barang)' },
+  { value: 'briefcase', label: 'Tas Kerja (Jasa Korporat)' },
+  { value: 'building', label: 'Gedung (Proyek dan Infrastruktur)' },
+  { value: 'handshake', label: 'Jabat Tangan (Kemitraan)' },
+  { value: 'shield', label: 'Perisai (Keamanan dan Kepatuhan)' },
+];
+const SERVICE_ICON_VALUES: ServiceIcon[] = SERVICE_ICON_OPTIONS.map((option) => option.value);
+const DEFAULT_SERVICE_ICON: ServiceIcon = SERVICE_ICON_VALUES[0] ?? 'zap';
+
+function isServiceIcon(value: string): value is ServiceIcon {
+  return SERVICE_ICON_VALUES.includes(value as ServiceIcon);
+}
+
+function getServiceIconByIndex(index: number): ServiceIcon {
+  return SERVICE_ICON_VALUES[index % SERVICE_ICON_VALUES.length] ?? DEFAULT_SERVICE_ICON;
+}
 
 function buildServiceBulletSlots(items: string[]): string[] {
   return Array.from({ length: SERVICE_BULLET_LIMIT }, (_, index) => items[index] ?? '');
@@ -242,7 +263,7 @@ export function AdminDashboardPage({ content, onSave, onReset, onLogout }: Admin
       title: '',
       description: '',
       items: [],
-      icon: base.services.items.length % 2 === 1 ? 'ship' : 'zap',
+      icon: getServiceIconByIndex(base.services.items.length),
     };
 
     return {
@@ -318,7 +339,7 @@ export function AdminDashboardPage({ content, onSave, onReset, onLogout }: Admin
           service.id === id
             ? {
                 ...service,
-                [field]: field === 'icon' ? (value === 'ship' ? 'ship' : 'zap') : value,
+                [field]: field === 'icon' ? (isServiceIcon(value) ? value : DEFAULT_SERVICE_ICON) : value,
               }
             : service,
         ),
@@ -689,10 +710,13 @@ export function AdminDashboardPage({ content, onSave, onReset, onLogout }: Admin
                         </button>
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-[var(--navy)] mb-1">Icon</label>
+                        <label className="block text-sm font-semibold text-[var(--navy)] mb-1">Ikon Layanan</label>
                         <select value={service.icon} onChange={(e) => updateService(service.id, 'icon', e.target.value)} className="w-full px-3 py-2 border border-[var(--navy)]/20 rounded-lg bg-white">
-                          <option value="zap">Zap</option>
-                          <option value="ship">Ship</option>
+                          {SERVICE_ICON_OPTIONS.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
                         </select>
                       </div>
                       <div>
