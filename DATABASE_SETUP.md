@@ -1,6 +1,6 @@
 # Database Setup (Vercel + Neon)
 
-Project ini menggunakan Neon Postgres (kompatibel dan direkomendasikan untuk Vercel).
+Project ini menggunakan Neon Postgres (kompatibel dan direkomendasikan untuk Vercel)...
 
 ## 1. Buat database Neon dari Vercel
 1. Buka project di Vercel Dashboard.
